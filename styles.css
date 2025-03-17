@@ -1,12 +1,15 @@
 :root {
-    --bg-color: #f0f4f8;
+    --primary-color: #F280D0;    /* Pink */
+    --secondary-color: #2168f7;  /* Blue */
+    --bg-color: #f0f4f8;         /* Original background */
     --text-color: #2d3748;
-    --button-bg: #e2e8f0;
-    --button-border: #cbd5e0;
-    --button-hover: #cbd5e0;
-    --transition-duration: 0.7s;
-    --particle-color: rgba(45, 55, 72, 0.1);
+    --button-bg: #e2e8f0;        /* Original button color */
+    --button-border: #cbd5e0;    /* Original button border */
+    --button-hover: #cbd5e0;     /* Original button hover */
+    --transition-duration: 0.9s;
+    --particle-color: var(--secondary-color); /* Blue particles */
     --circle-scale: 100;
+    --bg-color-rgb: 240, 244, 248;  /* Light mode RGB */
 }
 
 body {
@@ -15,73 +18,220 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     min-height: 100vh;
-    transition: background-color var(--transition-duration), color var(--transition-duration);
+    transition: 
+        background-color 0.2s ease-out calc(var(--transition-duration) * 0.5),
+        color 0.2s ease-out calc(var(--transition-duration) * 0.5);
     overflow-x: hidden;
     position: relative;
 }
 
 body.dark-mode {
-    --bg-color: #1a202c;
+    --bg-color: #1a202c;         /* Original dark background */
     --text-color: #e2e8f0;
-    --button-bg: #2d3748;
-    --button-border: #4a5568;
-    --button-hover: #4a5568;
-    --particle-color: rgba(226, 232, 240, 0.05);
+    --button-bg: #2d3748;        /* Original dark button */
+    --button-border: #4a5568;    /* Original dark button border */
+    --button-hover: #4a5568;     /* Original dark button hover */
+    --particle-color: var(--primary-color); /* Pink particles in dark mode */
+    --bg-color-rgb: 26, 32, 44;     /* Dark mode RGB */
 }
 
+/* Enhanced ray transition effect */
 .theme-transition-circle {
     position: fixed;
-    top: -50px;
-    right: -50px;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: var(--bg-color);
+    top: 0;
+    right: 0;
+    width: 180vmax;  /* Increased size for better coverage */
+    height: 180vmax;
+    transform-origin: calc(100% - 60px) 30px;
     transform: scale(0);
-    transition: transform var(--transition-duration) ease-in-out;
-    z-index: 1;
     pointer-events: none;
-    backdrop-filter: blur(4px);
+    z-index: 999;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 1deg,
+        #1a202c 1deg,
+        #1a202c 85deg,
+        var(--primary-color) 85deg,
+        var(--primary-color) 90deg,
+        transparent 90deg,
+        transparent 91deg,
+        #f0f4f8 91deg,
+        #f0f4f8 175deg,
+        var(--secondary-color) 175deg,
+        var(--secondary-color) 180deg,
+        transparent 180deg,
+        transparent 181deg,
+        #1a202c 181deg,
+        #1a202c 265deg,
+        var(--primary-color) 265deg,
+        var(--primary-color) 270deg,
+        transparent 270deg,
+        transparent 271deg,
+        #f0f4f8 271deg,
+        #f0f4f8 355deg,
+        var(--secondary-color) 355deg,
+        var(--secondary-color) 360deg
+    );
+    transition: all var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    opacity: 0.98;
+}
+
+body.dark-mode .theme-transition-circle {
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 1deg,
+        #f0f4f8 1deg,    /* Light theme color */
+        #f0f4f8 85deg,
+        var(--secondary-color) 85deg,   /* Blue accent */
+        var(--secondary-color) 90deg,
+        transparent 90deg,
+        transparent 91deg,
+        #1a202c 91deg,   /* Dark theme color */
+        #1a202c 175deg,
+        var(--primary-color) 175deg,  /* Pink accent */
+        var(--primary-color) 180deg,
+        transparent 180deg,
+        transparent 181deg,
+        #f0f4f8 181deg,  /* Light theme color */
+        #f0f4f8 265deg,
+        var(--secondary-color) 265deg,  /* Blue accent */
+        var(--secondary-color) 270deg,
+        transparent 270deg,
+        transparent 271deg,
+        #1a202c 271deg,  /* Dark theme color */
+        #1a202c 355deg,
+        var(--primary-color) 355deg,  /* Pink accent */
+        var(--primary-color) 360deg
+    );
+}
+
+/* Soften the glow effect */
+.theme-transition-circle::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    filter: blur(20px);
+    opacity: 0.25;
+    transition: all var(--transition-duration) ease-out;
+    will-change: opacity, filter;
 }
 
 body.animating .theme-transition-circle {
-    transform: scale(var(--circle-scale));
-    animation: pulseOpacity 0.7s ease-in-out;
+    transform: scale(1.2);
+    opacity: 1;
 }
 
-@keyframes pulseOpacity {
+body.animating .theme-transition-circle::after {
+    opacity: 0;
+    filter: blur(0);
+}
+
+/* Remove other effects for better performance */
+body.animating::before,
+body.animating::after {
+    display: none;
+}
+
+@keyframes morphing {
     0% {
-        opacity: 0.8;
+        clip-path: circle(50% at 50% 50%);
+        backdrop-filter: hue-rotate(0deg);
+    }
+    25% {
+        clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+        backdrop-filter: hue-rotate(90deg);
     }
     50% {
-        opacity: 0.6;
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        backdrop-filter: hue-rotate(180deg);
+    }
+    75% {
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        backdrop-filter: hue-rotate(270deg);
     }
     100% {
-        opacity: 1;
+        clip-path: circle(150% at 50% 50%);
+        backdrop-filter: hue-rotate(360deg);
+    }
+}
+
+@keyframes pulseBlur {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+/* Keep the line effects but make them more subtle */
+body.animating::before,
+body.animating::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--text-color) 0,
+        var(--text-color) 1px,
+        transparent 1px,
+        transparent 15px
+    );
+    opacity: 0;
+    z-index: 998;
+    pointer-events: none;
+    animation: sliceLines var(--transition-duration) ease-out forwards;
+}
+
+body.animating::after {
+    animation-delay: 0.1s;
+    transform: rotate(-90deg);
+}
+
+@keyframes sliceLines {
+    0% {
+        opacity: 0;
+        transform: translate(-100%, -100%) scale(0.5);
+    }
+    30% {
+        opacity: 0.1;
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(100%, 100%) scale(2);
     }
 }
 
 .theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px;
+    position: relative;
+    top: auto;
+    right: auto;
+    padding: 6px;
     border-radius: 50%;
     border: 2px solid var(--button-border);
     background-color: var(--button-bg);
     cursor: pointer;
-    width: 48px;
-    height: 48px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    z-index: 2;
-    overflow: hidden;
+    margin-left: 1rem;
+}
+
+.theme-toggle::before,
+.theme-toggle::after {
+    display: none;
 }
 
 .theme-toggle svg {
-    color: var(--text-color);
+    color: var(--primary-color);  /* Theme toggle icon now uses primary color */
     transition: transform 0.4s ease;
 }
 
@@ -97,11 +247,15 @@ body.dark-mode .dark-icon {
     display: inline;
 }
 
+body.dark-mode .theme-toggle svg {
+    color: var(--secondary-color);  /* Theme toggle icon uses secondary color in dark mode */
+}
+
 /* Ripple effect */
 .ripple {
     position: absolute;
     border-radius: 50%;
-    background-color: var(--text-color);
+    background-color: var(--primary-color);  /* Changed ripple to primary color */
     opacity: 0.4;
     transform: scale(0);
     animation: ripple 0.6s linear;
@@ -135,12 +289,13 @@ body.dark-mode .dark-icon {
     width: 200%;
     height: 200%;
     background: radial-gradient(circle at center, var(--particle-color) 1px, transparent 1px),
-                radial-gradient(circle at center, var(--particle-color) 1px, transparent 1px);
-    background-size: 40px 40px;
-    background-position: 0 0, 20px 20px;
+                radial-gradient(circle at center, var(--particle-color) 1px, transparent 1px),
+                radial-gradient(circle at center, var(--secondary-color) 0.5px, transparent 0.5px); /* Added third layer */
+    background-size: 40px 40px, 40px 40px, 30px 30px;
+    background-position: 0 0, 20px 20px, 10px 10px;
     opacity: 0.5;
     transition: opacity var(--transition-duration);
-    animation: particleFloat 30s linear infinite;
+    animation: particleFloat 30s linear infinite, particlePulse 4s ease-in-out infinite;
 }
 
 @keyframes particleFloat {
@@ -149,5 +304,502 @@ body.dark-mode .dark-icon {
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes particlePulse {
+    0%, 100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Navbar styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(var(--bg-color-rgb), 0.85);
+    padding: 0.3rem 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    transition: background-color calc(var(--transition-duration) * 0.5) ease-out calc(var(--transition-duration) * 0.5);
+    height: 40px;
+    backdrop-filter: blur(8px);
+}
+
+.navbar-brand {
+    position: relative;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: color calc(var(--transition-duration) * 0.5) ease-out calc(var(--transition-duration) * 0.5);
+    letter-spacing: 0.5px;
+}
+
+body.dark-mode .navbar-brand {
+    color: var(--secondary-color);
+}
+
+.navbar-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+/* Navbar toggle button - hide on large screens */
+.navbar-toggle {
+    display: none;  /* Hide by default on large screens */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--text-color);
+}
+
+/* Regular nav links - unselected state */
+.navbar-links a {
+    position: relative;
+    padding: 0.4rem 1.2rem;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text-color); /* Black in light mode, white in dark mode */
+}
+
+/* Active link container */
+.navbar-links a.active {
+    color: var(--secondary-color); /* Blue text in light mode */
+}
+
+.navbar-links a.active .nav-text-container {
+    position: relative;
+    padding: 0.6rem 1.4rem;
+    background: rgba(var(--bg-color-rgb), 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--primary-color-rgb), 0.1),
+        rgba(var(--secondary-color-rgb), 0.1)
+    );
+}
+
+/* Dark mode text colors */
+body.dark-mode .navbar-links a {
+    color: #fff; /* White text for unselected items in dark mode */
+}
+
+body.dark-mode .navbar-links a.active {
+    color: var(--primary-color); /* Pink text for selected items in dark mode */
+}
+
+/* Neon glow effect */
+.navbar-links a.active .nav-text-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        linear-gradient(90deg, transparent 0%, 
+            rgba(var(--primary-color-rgb), 0.2) 25%,
+            rgba(var(--secondary-color-rgb), 0.2) 50%,
+            rgba(var(--primary-color-rgb), 0.2) 75%,
+            transparent 100%) 0 0 / 200% 100%;
+    animation: shine 3s linear infinite;
+    z-index: -1;
+}
+
+/* Glowing edges */
+.navbar-links a.active .edge {
+    position: absolute;
+    background: var(--primary-color);
+}
+
+.navbar-links a.active .edge-top,
+.navbar-links a.active .edge-bottom {
+    height: 2px;
+    width: 100%;
+    transform: scaleX(0);
+}
+
+.navbar-links a.active .edge-left,
+.navbar-links a.active .edge-right {
+    width: 2px;
+    height: 100%;
+    transform: scaleY(0);
+}
+
+.navbar-links a.active .edge-top { top: 0; left: 0; transform-origin: left; }
+.navbar-links a.active .edge-right { top: 0; right: 0; transform-origin: top; }
+.navbar-links a.active .edge-bottom { bottom: 0; right: 0; transform-origin: right; }
+.navbar-links a.active .edge-left { bottom: 0; left: 0; transform-origin: bottom; }
+
+/* Animate edges */
+.navbar-links a.active .edge-top { animation: slideRight 0.3s ease forwards; }
+.navbar-links a.active .edge-right { animation: slideDown 0.3s ease 0.3s forwards; }
+.navbar-links a.active .edge-bottom { animation: slideLeft 0.3s ease 0.6s forwards; }
+.navbar-links a.active .edge-left { animation: slideUp 0.3s ease 0.9s forwards; }
+
+/* Energy orbs */
+.navbar-links a.active .orb {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    box-shadow: 
+        0 0 10px var(--primary-color),
+        0 0 20px var(--primary-color),
+        0 0 30px var(--primary-color);
+    opacity: 0;
+}
+
+.navbar-links a.active .orb-tl { top: -3px; left: -3px; animation: orbPulse 2s ease infinite; }
+.navbar-links a.active .orb-tr { top: -3px; right: -3px; animation: orbPulse 2s ease 0.5s infinite; }
+.navbar-links a.active .orb-bl { bottom: -3px; left: -3px; animation: orbPulse 2s ease 1s infinite; }
+.navbar-links a.active .orb-br { bottom: -3px; right: -3px; animation: orbPulse 2s ease 1.5s infinite; }
+
+/* Animations */
+@keyframes shine {
+    to { background-position: 200% 0; }
+}
+
+@keyframes slideRight {
+    to { transform: scaleX(1); }
+}
+
+@keyframes slideDown {
+    to { transform: scaleY(1); }
+}
+
+@keyframes slideLeft {
+    to { transform: scaleX(1); }
+}
+
+@keyframes slideUp {
+    to { transform: scaleY(1); }
+}
+
+@keyframes orbPulse {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(0); opacity: 1; }
+}
+
+/* Hover effects */
+.navbar-links a:hover:not(.active) {
+    transform: translateY(-2px);
+    text-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.5);
+}
+
+/* Dark mode enhancements */
+body.dark-mode .navbar-links a.active {
+    text-shadow: 
+        0 0 10px var(--secondary-color),
+        0 0 20px var(--secondary-color),
+        0 0 30px var(--secondary-color);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .navbar-toggle {
+        display: block; /* Only show toggle on mobile */
+    }
+
+    .navbar-links {
+        position: fixed;
+        top: 40px;
+        right: -100%;
+        flex-direction: column;
+        background-color: var(--bg-color);
+        width: 70%;
+        height: calc(100vh - 40px);
+        padding: 2rem;
+        transition: right 0.3s ease-out;
+    }
+
+    .navbar-links.active {
+        right: 0;
+    }
+
+    .navbar-links a {
+        width: 100%;
+        padding: 1rem 0;
+        text-align: center;
+    }
+
+    .navbar-links a::before {
+        display: none;
+    }
+
+    .theme-toggle {
+        margin: 1rem auto; /* Center the button in mobile menu */
+    }
+}
+
+/* Dark mode adjustments */
+body.dark-mode .navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Main content sections */
+.section {
+    padding-top: 60px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scroll-margin-top: 40px;
+}
+
+#home {
+    background: linear-gradient(135deg, rgba(242, 128, 208, 0.1), rgba(33, 104, 247, 0.1));
+}
+
+#about {
+    background-color: var(--bg-color);
+}
+
+#services {
+    background: linear-gradient(135deg, rgba(33, 104, 247, 0.1), rgba(242, 128, 208, 0.1));
+}
+
+#contact {
+    background-color: var(--bg-color);
+}
+
+.section-content {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-links {
+        padding-bottom: 2rem;
+    }
+
+    .section {
+        padding: 60px 1rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+/* Ensure all color transitions are smooth */
+.navbar,
+.navbar-brand,
+.navbar-links a,
+.theme-toggle,
+.section-title,
+.background-particles::before {
+    transition: all 0.3s ease-out var(--transition-duration);
+}
+
+@keyframes pulseOpacity {
+    0%, 100% {
+        opacity: 1;
+    }
+}
+
+/* Add floating particles during transition */
+body.animating::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 20%, var(--primary-color) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, var(--secondary-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0;
+    z-index: 998;
+    pointer-events: none;
+    animation: fadeParticles 0.8s ease-in-out forwards;
+    will-change: opacity, transform;
+}
+
+@keyframes fadeParticles {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.2);
+    }
+}
+
+/* Reset previous styles */
+.navbar-links a.active::before,
+.navbar-links a.active::after {
+    display: none;
+}
+
+/* Modern container style */
+.navbar-links a.active .nav-text-container {
+    position: relative;
+    padding: 0.5rem 1.2rem;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--primary-color-rgb), 0.1),
+        rgba(var(--secondary-color-rgb), 0.1)
+    );
+    border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    box-shadow: 
+        0 0 20px rgba(var(--primary-color-rgb), 0.15),
+        inset 0 0 20px rgba(var(--primary-color-rgb), 0.05);
+}
+
+/* Animated highlight effect */
+.navbar-links a.active .nav-text-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(var(--primary-color-rgb), 0.2),
+        rgba(var(--secondary-color-rgb), 0.2),
+        transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer 3s infinite;
+}
+
+/* Enhanced text effect */
+.navbar-links a.active .nav-text {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(
+        90deg,
+        var(--primary-color),
+        var(--secondary-color)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Glowing border effect */
+.navbar-links a.active .border-glow {
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: 6px;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    background: linear-gradient(
+        90deg,
+        var(--primary-color),
+        var(--secondary-color),
+        var(--primary-color)
+    );
+    animation: borderRotate 4s linear infinite;
+}
+
+/* Floating particles */
+.navbar-links a.active .particle {
+    background: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+    animation: floatParticle 1.5s ease-in-out infinite;
+}
+
+/* Enhanced animations */
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+@keyframes borderRotate {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+@keyframes floatParticle {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateY(-10px) scale(1.2);
+        opacity: 0.4;
+    }
+}
+
+/* Light mode specific adjustments */
+body:not(.dark-mode) .navbar-links a.active {
+    text-shadow: 0 0 15px rgba(var(--primary-color-rgb), 0.3);
+}
+
+body:not(.dark-mode) .navbar-links a.active .nav-text-container {
+    background: linear-gradient(
+        135deg,
+        rgba(var(--primary-color-rgb), 0.15),
+        rgba(var(--secondary-color-rgb), 0.15)
+    );
+    border-color: rgba(var(--primary-color-rgb), 0.3);
+    box-shadow: 
+        0 4px 15px rgba(var(--primary-color-rgb), 0.1),
+        inset 0 0 20px rgba(var(--primary-color-rgb), 0.05);
+}
+
+/* Add smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Active section highlight in mobile menu */
+@media (max-width: 768px) {
+    .navbar-links a.active {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(var(--primary-color-rgb), 0.1),
+            transparent
+        );
     }
 } 
